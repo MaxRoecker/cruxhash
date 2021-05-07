@@ -1,0 +1,73 @@
+{
+  "name": "cruxhash",
+  "version": "0.0.1",
+  "description": "A set of crucial hash functions for ECMAScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest ./tests.ts",
+    "test:coverage": "npm run test && npx serve ./jest/coverage/lcov-report",
+    "lint": "eslint --ext .ts . --ignore-path .gitignore",
+    "format": "eslint --ext .ts . --fix --ignore-path .gitignore"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxRoecker/cruxhash.git"
+  },
+  "keywords": [
+    "hash"
+  ],
+  "author": "Max Naegeler Roecker",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MaxRoecker/cruxhash/issues"
+  },
+  "homepage": "https://github.com/MaxRoecker/cruxhash#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "eslint-config-prettier": "^8.3.0",
+    "jest": "^26.5.0",
+    "prettier": "^2.2.1",
+    "serve": "^11.3.2",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "always"
+  },
+  "jest": {
+    "clearMocks": true,
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests.ts"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.ts$": "ts-jest"
+    },
+    "collectCoverage": true,
+    "coverageDirectory": "./jest/coverage",
+    "collectCoverageFrom": [
+      "./index.ts"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov"
+    ]
+  }
+}
