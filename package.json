@@ -3,12 +3,17 @@
   "version": "0.0.1",
   "description": "A set of crucial hash functions for ECMAScript",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "ci": "npm t & wait",
     "build": "tsc",
     "test": "jest ./tests.ts",
     "test:coverage": "npm run test && npx serve ./jest/coverage/lcov-report",
     "lint": "eslint --ext .ts . --ignore-path .gitignore",
-    "format": "eslint --ext .ts . --fix --ignore-path .gitignore"
+    "format": "eslint --ext .ts . --fix --ignore-path .gitignore",
+    "prepublish": "npm run build && npm publish --dry-run"
   },
   "repository": {
     "type": "git",
