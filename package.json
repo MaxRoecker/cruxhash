@@ -1,6 +1,6 @@
 {
   "name": "cruxhash",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Max Naegeler Roecker",
   "license": "MIT",
   "description": "A set of crucial hash functions for ECMAScript",
