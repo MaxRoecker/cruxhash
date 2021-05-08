@@ -8,6 +8,15 @@
   "module": "dist/index.js",
   "type": "module",
   "typings": "index.d.ts",
+  "files": [
+    "/dist/index.{d.ts,d.ts.map,js,js.map}",
+    "index.ts"
+  ],
+  "exports": {
+    ".": {
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
