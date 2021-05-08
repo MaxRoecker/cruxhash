@@ -88,7 +88,7 @@ elements. Based on
 where each element of the iterable is hashed with `hash`. You can also pass a
 seed to initialize the hashing.
 
-### `hashIterableAsMap(value: Iterable<unknown>, seed?: number)`
+### `hashIterableAsMap(value: Iterable<[unknown, unknown]>, seed?: number)`
 
 Hashes an iterable into a unsigned int ignoring the order of the keys. Based on
 [FNV-1a Hashing algorithm](http://www.isthe.com/chongo/tech/comp/fnv/index.html)
