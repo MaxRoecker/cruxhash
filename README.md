@@ -18,13 +18,15 @@ for trivial ECMAScript values. See the example bellow:
 ```js
 import { hash, getSeed } from 'cruxhash';
 
-hash('Smile, my dear!'); // returns 2630677830
+console.log(hash('Smile, my dear!')); // returns 2630677830
 
-hash(42, getSeed('my seed')); // returns 1833929388
+console.log(hash(42, getSeed('my seed'))); // returns 1833929388
 
-hash({ a: 1, b: 2 }); // returns 873943707
+console.log(hash({ a: 10, b: 10 })); // returns 2072876308
 
-hash([1, 2, 3]); // returns 2122060211
+console.log(hash([1, 2, 3])); // returns 2122060211
+
+console.log(hash('コンニチハ, Hello world, Καλημέρα κόσμε 😀')); // returns 1672729357
 ```
 
 ## API
