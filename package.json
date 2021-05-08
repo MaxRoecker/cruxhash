@@ -1,14 +1,16 @@
 {
   "name": "cruxhash",
   "version": "0.0.1",
+  "author": "Max Naegeler Roecker",
+  "license": "MIT",
   "description": "A set of crucial hash functions for ECMAScript",
   "main": "dist/index.js",
-  "files": [
-    "dist"
-  ],
+  "module": "dist/index.js",
+  "type": "module",
+  "typings": "index.d.ts",
   "scripts": {
-    "ci": "npm t & wait",
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
     "test": "jest ./tests.ts",
     "test:coverage": "npm run test && npx serve ./jest/coverage/lcov-report",
     "lint": "eslint --ext .ts . --ignore-path .gitignore",
@@ -22,8 +24,6 @@
   "keywords": [
     "hash"
   ],
-  "author": "Max Naegeler Roecker",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/MaxRoecker/cruxhash/issues"
   },

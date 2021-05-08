@@ -5,7 +5,6 @@ import {
   hashNumber,
   hashString,
   hashSymbol,
-  hashBigInt,
   hashFunction,
   hashIterable,
   hashObject,
@@ -95,20 +94,6 @@ describe('hashSymbol tests', () => {
   });
 });
 
-describe('hashBigInt tests', () => {
-  it('should return the same hash for the same value', () => {
-    expect(hashBigInt(8n)).toBe(hashBigInt(8n));
-    expect(hashBigInt(0n)).toBe(hashBigInt(-0n));
-    expect(hashBigInt(100000000000n)).toBe(hashBigInt(100000000000n));
-  });
-  it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
-    expect(hashBigInt(8n, seed)).not.toBe(hashBigInt(8n));
-    expect(hashBigInt(0n, seed)).not.toBe(hashBigInt(-0n));
-    expect(hashBigInt(100000000000n, seed)).not.toBe(hashBigInt(100000000000n));
-  });
-});
-
 describe('hashFunction tests', () => {
   it('should return the same hash for the same value', () => {
     expect(hashFunction(() => void 0)).toBe(hashFunction(() => void 0));
@@ -177,9 +162,9 @@ describe('hashObject tests', () => {
     expect(hashObject(null)).toBe(hashObject(null));
     expect(hashObject({})).toBe(hashObject({}));
     expect(hashObject({ a: undefined })).toBe(hashObject({ a: undefined }));
-    expect(hashObject({ a: 1, b: 2n, c: () => void 0, d: Symbol.match })).toBe(
-      hashObject({ b: 2n, a: 1, c: () => void 0, d: Symbol.match })
-    );
+    expect(
+      hashObject({ a: 1, b: null, c: () => void 0, d: Symbol.match })
+    ).toBe(hashObject({ b: null, a: 1, c: () => void 0, d: Symbol.match }));
     expect(hashObject(new Date(0))).toBe(hashObject(new Date(0)));
   });
   it('should return different hash for different seeds', () => {
@@ -190,8 +175,8 @@ describe('hashObject tests', () => {
       hashObject({ a: undefined })
     );
     expect(
-      hashObject({ a: 1, b: 2n, c: () => void 0, d: Symbol.match }, seed)
-    ).not.toBe(hashObject({ b: 2n, a: 1, c: () => void 0, d: Symbol.match }));
+      hashObject({ a: 1, b: null, c: () => void 0, d: Symbol.match }, seed)
+    ).not.toBe(hashObject({ b: null, a: 1, c: () => void 0, d: Symbol.match }));
     expect(hashObject(new Date(0), seed)).not.toBe(hashObject(new Date(0)));
   });
   it('should consider the hashCode method', () => {

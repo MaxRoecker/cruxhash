@@ -129,13 +129,6 @@ export const hashSymbol = (sym: symbol, seed = defaultSeed): number => {
 };
 
 /**
- * Hashes a bigint into a unsigned int.
- */
-export const hashBigInt = (int: bigint, seed = defaultSeed): number => {
-  return hashString(int.toString() + 'n', seed);
-};
-
-/**
  * Hashes a function into a unsigned int considering its string representation.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -197,8 +190,6 @@ export const hash = (value: unknown, seed = defaultSeed): number => {
       return hashString(value, seed);
     case 'symbol':
       return hashSymbol(value, seed);
-    case 'bigint':
-      return hashBigInt(value, seed);
     case 'function':
       return hashFunction(value, seed);
     case 'object':
