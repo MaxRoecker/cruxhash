@@ -163,8 +163,8 @@ export const hashIterable = (
 
 /**
  * Hashes an iterable into a unsigned int ignoring the order of the elements.
- * Based on FNV-1a Hashing algorithm where each element of the iterable is
- * hashed with `hash`. You can also pass a seed to initialize the hashing.
+ * Based on FNV-1a Hashing algorithm where each element is hashed with `hash`.
+ * You can also pass a seed to initialize the hashing.
  */
 export const hashIterableAsSet = (
   itr: Iterable<unknown>,
@@ -175,25 +175,15 @@ export const hashIterableAsSet = (
 };
 
 /**
- * Hashes an iterable into a unsigned int ignoring the order of the keys. Based
- * on FNV-1a Hashing algorithm where each entry of the iterable is hashed with
- * `hash`. You can also pass a seed to initialize the hashing.
+ * Hashes an iterable into a unsigned int ignoring the order of the entries.
+ * Based on FNV-1a Hashing algorithm where each entry is hashed with
+ * `hashIterable`. You can also pass a seed to initialize the hashing.
  */
 export const hashIterableAsMap = (
   itr: Iterable<[unknown, unknown]>,
   seed = defaultSeed
 ): number => {
-  type Trio = [number, [unknown, unknown]];
-  const createTrio = (entry: [unknown, unknown]): Trio => {
-    return [hash(entry[0], seed), entry];
-  };
-  const compareTrio = (a: Trio, b: Trio): number => {
-    return a[0] - b[0];
-  };
-  const hashTrio = (trio: Trio): number => {
-    return hash(trio[1], seed);
-  };
-  const arr = Array.from(itr, createTrio).sort(compareTrio).map(hashTrio);
+  const arr = Array.from(itr, (value) => hashIterable(value)).sort();
   return hashArray(arr, seed);
 };
 

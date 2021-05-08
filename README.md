@@ -84,18 +84,19 @@ where each element of the iterable is hashed with `hash`.
 
 ### `hashIterableAsSet(value: Iterable<unknown>, seed?: number)`
 
-Hashes an iterable into a unsigned int ignoring the order of the
-elements. Based on
+Hashes an iterable into a unsigned int ignoring the order of the elements. Based
+on
 [FNV-1a Hashing algorithm](http://www.isthe.com/chongo/tech/comp/fnv/index.html)
-where each element of the iterable is hashed with `hash`. You can also pass a
-seed to initialize the hashing.
+where each element is hashed with `hash`. You can also pass a seed to initialize
+the hashing.
 
 ### `hashIterableAsMap(value: Iterable<[unknown, unknown]>, seed?: number)`
 
-Hashes an iterable into a unsigned int ignoring the order of the keys. Based on
+Hashes an iterable into a unsigned int ignoring the order of the entries. Based
+on
 [FNV-1a Hashing algorithm](http://www.isthe.com/chongo/tech/comp/fnv/index.html)
-where each entry of the iterable is hashed with `hash`. You can also pass a seed
-to initialize the hashing.
+where each entry of is hashed with `hashIterable`. You can also pass a seed to
+initialize the hashing.
 
 ### `getSeed(str: string)`
 
