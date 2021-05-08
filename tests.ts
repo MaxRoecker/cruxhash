@@ -1,4 +1,3 @@
-import type { Seed } from './index';
 import {
   getSeed,
   hashBoolean,
@@ -7,6 +6,8 @@ import {
   hashSymbol,
   hashFunction,
   hashIterable,
+  hashIterableAsSet,
+  hashIterableAsMap,
   hashObject,
 } from './index';
 
@@ -15,9 +16,9 @@ describe('getSeed tests', () => {
     const case0 = '';
     const case1 = 'Smile my dear!';
     const case2 = "You know you're not fully dressed without one.";
-    expect(getSeed(case0)).toStrictEqual([0x811c, 0x9dc5]);
-    expect(getSeed(case1)).toStrictEqual([0xf452, 0x1e04]);
-    expect(getSeed(case2)).toStrictEqual([0x69a9, 0x5827]);
+    expect(getSeed(case0)).toStrictEqual(2166136261);
+    expect(getSeed(case1)).toStrictEqual(4099022340);
+    expect(getSeed(case2)).toStrictEqual(1772705831);
   });
   it('should return the same seed for the same string', () => {
     const str = 'Smile my dear!';
@@ -34,7 +35,7 @@ describe('hashBoolean tests', () => {
     expect(hashBoolean(false)).toBe(hashBoolean(false));
   });
   it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(hashBoolean(true, seed)).not.toBe(hashBoolean(true));
     expect(hashBoolean(false, seed)).not.toBe(hashBoolean(false));
   });
@@ -50,7 +51,7 @@ describe('hashNumber tests', () => {
     expect(hashNumber(-Infinity)).toBe(hashNumber(-Infinity));
   });
   it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(hashNumber(8, seed)).not.toBe(hashNumber(8));
     expect(hashNumber(+0, seed)).not.toBe(hashNumber(-0));
     expect(hashNumber(10e10, seed)).not.toBe(hashNumber(10e10));
@@ -69,7 +70,7 @@ describe('hashString tests', () => {
     );
   });
   it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(hashString('', seed)).not.toBe(hashString(''));
     expect(hashString('Smile my dear!', seed)).not.toBe(
       hashString('Smile my dear!')
@@ -86,7 +87,7 @@ describe('hashSymbol tests', () => {
     expect(hashSymbol(Symbol.match)).toBe(hashSymbol(Symbol.match));
   });
   it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(hashSymbol(Symbol.iterator, seed)).not.toBe(
       hashSymbol(Symbol.iterator)
     );
@@ -101,59 +102,12 @@ describe('hashFunction tests', () => {
     expect(hashFunction(it)).toBe(hashFunction(it));
   });
   it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(hashFunction(() => void 0, seed)).not.toBe(
       hashFunction(() => void 0)
     );
     expect(hashFunction(describe, seed)).not.toBe(hashFunction(describe));
     expect(hashFunction(it, seed)).not.toBe(hashFunction(it));
-  });
-});
-
-describe('hashIterable tests', () => {
-  it('should return the same hash for the same value', () => {
-    expect(hashIterable([1, 2, 3])).toBe(hashIterable([1, 2, 3]));
-    expect(
-      hashIterable(
-        new Map([
-          ['a', 1],
-          ['b', 2],
-        ])
-      )
-    ).toBe(
-      hashIterable(
-        new Map([
-          ['a', 1],
-          ['b', 2],
-        ])
-      )
-    );
-    expect(hashIterable(new Set([null, true, 'a']))).toBe(
-      hashIterable(new Set([null, true, 'a']))
-    );
-  });
-  it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
-    expect(hashIterable([1, 2, 3], seed)).not.toBe(hashIterable([1, 2, 3]));
-    expect(
-      hashIterable(
-        new Map([
-          ['a', 1],
-          ['b', 2],
-        ]),
-        seed
-      )
-    ).not.toBe(
-      hashIterable(
-        new Map([
-          ['a', 1],
-          ['b', 2],
-        ])
-      )
-    );
-    expect(hashIterable(new Set([null, true, 'a']), seed)).not.toBe(
-      hashIterable(new Set([null, true, 'a']))
-    );
   });
 });
 
@@ -168,7 +122,7 @@ describe('hashObject tests', () => {
     expect(hashObject(new Date(0))).toBe(hashObject(new Date(0)));
   });
   it('should return different hash for different seeds', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(hashObject(null, seed)).not.toBe(hashObject(null));
     expect(hashObject({}, seed)).not.toBe(hashObject({}));
     expect(hashObject({ a: undefined }, seed)).not.toBe(
@@ -180,7 +134,7 @@ describe('hashObject tests', () => {
     expect(hashObject(new Date(0), seed)).not.toBe(hashObject(new Date(0)));
   });
   it('should consider the hashCode method', () => {
-    const seed: Seed = [0x811c, 0x9dc5];
+    const seed = 0x9dc5811c;
     expect(
       hashObject({
         hashCode() {
@@ -225,6 +179,170 @@ describe('hashObject tests', () => {
           return 0x9dc5;
         },
       })
+    );
+  });
+});
+
+describe('hashIterable tests', () => {
+  it('should return the same hash for the same value', () => {
+    expect(hashIterable([1, 2, 3])).toBe(hashIterable([1, 2, 3]));
+    expect(
+      hashIterable([
+        ['a', 1],
+        ['b', 2],
+      ])
+    ).toBe(
+      hashIterable([
+        ['a', 1],
+        ['b', 2],
+      ])
+    );
+    expect(hashIterable([null, true, 'a'])).toBe(
+      hashIterable([null, true, 'a'])
+    );
+  });
+  it('should return different hash for different seeds', () => {
+    const seed = 0x9dc5811c;
+    expect(hashIterable([1, 2, 3], seed)).not.toBe(hashIterable([1, 2, 3]));
+    expect(
+      hashIterable(
+        [
+          ['a', 1],
+          ['b', 2],
+        ],
+        seed
+      )
+    ).not.toBe(
+      hashIterable([
+        ['a', 1],
+        ['b', 2],
+      ])
+    );
+    expect(hashIterable([null, true, 'a'], seed)).not.toBe(
+      hashIterable([null, true, 'a'])
+    );
+  });
+  it('should return different hash for different orders', () => {
+    expect(hashIterable([1, 2, 3])).not.toBe(hashIterable([3, 1, 2]));
+    expect(
+      hashIterable([
+        ['a', 1],
+        ['b', 2],
+      ])
+    ).not.toBe(
+      hashIterable([
+        ['b', 2],
+        ['a', 1],
+      ])
+    );
+    expect(hashIterable([null, true, 'a'])).not.toBe(
+      hashIterable(['a', null, true])
+    );
+  });
+});
+
+describe('hashIterableSet tests', () => {
+  it('should return the same hash for the same value', () => {
+    expect(hashIterableAsSet([1, 2, 3])).toBe(hashIterableAsSet([1, 2, 3]));
+    expect(
+      hashIterableAsSet([
+        ['a', 1],
+        ['b', 2],
+      ])
+    ).toBe(
+      hashIterableAsSet([
+        ['a', 1],
+        ['b', 2],
+      ])
+    );
+    expect(hashIterableAsSet([null, true, 'a'])).toBe(
+      hashIterableAsSet([null, true, 'a'])
+    );
+  });
+  it('should return different hash for different seeds', () => {
+    const seed = 0x9dc5811c;
+    expect(hashIterableAsSet([1, 2, 3], seed)).not.toBe(
+      hashIterableAsSet([1, 2, 3])
+    );
+    expect(
+      hashIterableAsSet(
+        [
+          ['a', 1],
+          ['b', 2],
+        ],
+        seed
+      )
+    ).not.toBe(
+      hashIterableAsSet([
+        ['a', 1],
+        ['b', 2],
+      ])
+    );
+    expect(hashIterableAsSet([null, true, 'a'], seed)).not.toBe(
+      hashIterableAsSet([null, true, 'a'])
+    );
+  });
+  it('should return the same hash for different orders', () => {
+    expect(hashIterableAsSet([1, 2, 3])).toBe(hashIterableAsSet([3, 1, 2]));
+    expect(
+      hashIterableAsSet([
+        ['a', 1],
+        ['b', 2],
+      ])
+    ).toBe(
+      hashIterableAsSet([
+        ['b', 2],
+        ['a', 1],
+      ])
+    );
+    expect(hashIterableAsSet([null, true, 'a'])).toBe(
+      hashIterableAsSet(['a', null, true])
+    );
+  });
+});
+
+describe('hashIterableMap tests', () => {
+  it('should return the same hash for the same value', () => {
+    expect(
+      hashIterableAsMap([
+        ['a', 1],
+        ['b', 2],
+      ])
+    ).toBe(
+      hashIterableAsMap([
+        ['a', 1],
+        ['b', 2],
+      ])
+    );
+  });
+  it('should return different hash for different seeds', () => {
+    const seed = 0x9dc5811c;
+    expect(
+      hashIterableAsMap(
+        [
+          ['a', 1],
+          ['b', 2],
+        ],
+        seed
+      )
+    ).not.toBe(
+      hashIterableAsMap([
+        ['a', 1],
+        ['b', 2],
+      ])
+    );
+  });
+  it('should return the same hash for different orders', () => {
+    expect(
+      hashIterableAsMap([
+        ['a', 1],
+        ['b', 2],
+      ])
+    ).toBe(
+      hashIterableAsMap([
+        ['b', 2],
+        ['a', 1],
+      ])
     );
   });
 });
