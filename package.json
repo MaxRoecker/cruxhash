@@ -23,8 +23,7 @@
     "test": "jest ./tests.ts",
     "test:coverage": "npm run test && npx serve ./jest/coverage/lcov-report",
     "lint": "eslint --ext .ts . --ignore-path .gitignore",
-    "format": "eslint --ext .ts . --fix --ignore-path .gitignore",
-    "prepublish": "npm run build && npm publish --dry-run"
+    "format": "eslint --ext .ts . --fix --ignore-path .gitignore"
   },
   "repository": {
     "type": "git",
