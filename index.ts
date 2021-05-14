@@ -11,7 +11,7 @@ const defaultSeed = 0x811c9dc5;
 export const hash = (value: unknown, seed = defaultSeed): number => {
   switch (typeof value) {
     case 'undefined':
-      return (0x42108423 ^ seed) >>> 0;
+      return (seed ^ 0x42108423) >>> 0;
     case 'boolean':
       return hashBoolean(value, seed);
     case 'number':
@@ -25,7 +25,7 @@ export const hash = (value: unknown, seed = defaultSeed): number => {
     case 'object':
       return hashObject(value, seed);
     default:
-      return (0x42108424 ^ seed) >>> 0;
+      return (seed ^ 0x42108424) >>> 0;
   }
 };
 
@@ -33,11 +33,11 @@ export const hash = (value: unknown, seed = defaultSeed): number => {
  * Hashes a boolean into a unsigned int. Guarantees different results for the
  * `true` and `false`. You can also pass a seed to initialize the hashing.
  */
-export const hashBoolean = (bool: boolean, seed = defaultSeed): number => {
-  if (bool) {
-    return (0x42108421 ^ seed) >>> 0;
+export const hashBoolean = (value: boolean, seed = defaultSeed): number => {
+  if (value) {
+    return (seed ^ 0x42108421) >>> 0;
   } else {
-    return (0x42108420 ^ seed) >>> 0;
+    return (seed ^ 0x42108420) >>> 0;
   }
 };
 
@@ -46,11 +46,11 @@ export const hashBoolean = (bool: boolean, seed = defaultSeed): number => {
  * hash algorithm. Provides support for `NaN`, `Infinity` and `-Infinity`. You
  * can also pass a seed to initialize the hashing.
  */
-export const hashNumber = (num: number, seed = defaultSeed): number => {
-  if (Number.isNaN(num)) return (0x42108425 ^ seed) >>> 0;
-  if (num === Number.POSITIVE_INFINITY) return (0x42108426 ^ seed) >>> 0;
-  if (num === Number.NEGATIVE_INFINITY) return (0x42108427 ^ seed) >>> 0;
-  let hashed = num ^ seed;
+export const hashNumber = (value: number, seed = defaultSeed): number => {
+  if (Number.isNaN(value)) return (seed ^ 0x42108425) >>> 0;
+  if (value === Number.POSITIVE_INFINITY) return (seed ^ 0x42108426) >>> 0;
+  if (value === Number.NEGATIVE_INFINITY) return (seed ^ 0x42108427) >>> 0;
+  let hashed = seed ^ value;
   hashed -= hashed << 6;
   hashed ^= hashed >> 17;
   hashed -= hashed << 9;
@@ -66,8 +66,8 @@ export const hashNumber = (num: number, seed = defaultSeed): number => {
  * Provides support for unicode strings. You can also pass a seed to initialize
  * the hashing.
  */
-export const hashString = (str: string, seed = defaultSeed): number => {
-  const unescaped = unescape(encodeURIComponent(str));
+export const hashString = (value: string, seed = defaultSeed): number => {
+  const unescaped = unescape(encodeURIComponent(value));
   const length = unescaped.length;
   let hashed = seed;
   let i = 0;
@@ -88,8 +88,8 @@ export const hashString = (str: string, seed = defaultSeed): number => {
  * Hashes a symbol into a unsigned int considering its string representation.
  * You can also pass a seed to initialize the hashing.
  */
-export const hashSymbol = (sym: symbol, seed = defaultSeed): number => {
-  return hashString(sym.toString(), seed);
+export const hashSymbol = (value: symbol, seed = defaultSeed): number => {
+  return hashString(value.toString(), seed);
 };
 
 /**
@@ -97,55 +97,39 @@ export const hashSymbol = (sym: symbol, seed = defaultSeed): number => {
  * You can also pass a seed to initialize the hashing.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const hashFunction = (fun: Function, seed = defaultSeed): number => {
-  return hashString(fun.toString(), seed);
+export const hashFunction = (value: Function, seed = defaultSeed): number => {
+  return hashString(value.toString(), seed);
 };
 
 /**
  * Hashes an object value into a unsigned int considering:
  *
- * - If it has an `hashCode` method, returns the `obj.hashCode() >>> 0`;
- * - If it is an iterable, returns the `hashIterable(obj, seed)`;
- * - If it has an `valueOf` method that does not returns itself, returns
- *   `hash(obj.valueOf(), seed)`;
+ * - If it is `null`, returns a fixed value.
+ * - If it has a `hashCode`, returns `hash(obj.hashCode(), seed)`;
+ * - If it has an overwritten `valueOf`, returns `hash(obj.valueOf(), seed)`;
+ * - If it has a `Symbol.iterator`, returns `hashIterable(obj, seed)`;
  * - Otherwise, returns `hashIterableAsMap(Object.entries(obj))`.
- *
- * Provides support for `null` values.
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const hashObject = (obj: object | null, seed = defaultSeed): number => {
-  if (obj === null) {
-    return (0x42108422 ^ seed) >>> 0;
+export const hashObject = (
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  value: object | null,
+  seed = defaultSeed
+): number => {
+  if (value === null) return (seed ^ 0x42108422) >>> 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const obj: any = value;
+  if (typeof obj.hashCode === 'function') {
+    return hash(obj.hashCode(), seed);
+  } else if (
+    typeof obj.valueOf === 'function' &&
+    obj.valueOf !== Object.prototype.valueOf
+  ) {
+    return hash(obj.valueOf(), seed);
+  } else if (obj[Symbol.iterator] != undefined) {
+    return hashIterable(obj, seed);
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const target: any = obj;
-    if (typeof target.hashCode === 'function') {
-      return target.hashCode() >>> 0;
-    } else if (target[Symbol.iterator] != undefined) {
-      return hashIterable(target, seed);
-    } else if (typeof obj.valueOf === 'function' && obj.valueOf() !== obj) {
-      return hash(obj.valueOf(), seed);
-    } else {
-      return hashIterableAsMap(Object.entries(obj), seed);
-    }
+    return hashIterableAsMap(Object.entries(obj), seed);
   }
-};
-
-const hashArray = (arr: Array<number>, seed: number): number => {
-  const length = arr.length;
-  let hashed = seed;
-  let i = 0;
-  while (i < length) {
-    hashed ^= arr[i];
-    hashed +=
-      (hashed << 1) +
-      (hashed << 4) +
-      (hashed << 7) +
-      (hashed << 8) +
-      (hashed << 24);
-    i += 1;
-  }
-  return hashed >>> 0;
 };
 
 /**
@@ -154,10 +138,10 @@ const hashArray = (arr: Array<number>, seed: number): number => {
  * `hash`. You can also pass a seed to initialize the hashing.
  */
 export const hashIterable = (
-  itr: Iterable<unknown>,
+  value: Iterable<unknown>,
   seed = defaultSeed
 ): number => {
-  const arr = Array.from(itr, (value) => hash(value, seed));
+  const arr = Array.from(value, (value) => hash(value, seed));
   return hashArray(arr, seed);
 };
 
@@ -167,10 +151,10 @@ export const hashIterable = (
  * You can also pass a seed to initialize the hashing.
  */
 export const hashIterableAsSet = (
-  itr: Iterable<unknown>,
+  value: Iterable<unknown>,
   seed = defaultSeed
 ): number => {
-  const arr = Array.from(itr, (value) => hash(value, seed)).sort();
+  const arr = Array.from(value, (value) => hash(value, seed)).sort();
   return hashArray(arr, seed);
 };
 
@@ -180,10 +164,10 @@ export const hashIterableAsSet = (
  * `hashIterable`. You can also pass a seed to initialize the hashing.
  */
 export const hashIterableAsMap = (
-  itr: Iterable<[unknown, unknown]>,
+  value: Iterable<[unknown, unknown]>,
   seed = defaultSeed
 ): number => {
-  const arr = Array.from(itr, (value) => hashIterable(value)).sort();
+  const arr = Array.from(value, (value) => hashIterable(value)).sort();
   return hashArray(arr, seed);
 };
 
@@ -192,4 +176,21 @@ export const hashIterableAsMap = (
  */
 export const getSeed = (str: string): number => {
   return hashString(str, defaultSeed);
+};
+
+const hashArray = (value: Array<number>, seed: number): number => {
+  const length = value.length;
+  let hashed = seed;
+  let i = 0;
+  while (i < length) {
+    hashed ^= value[i];
+    hashed +=
+      (hashed << 1) +
+      (hashed << 4) +
+      (hashed << 7) +
+      (hashed << 8) +
+      (hashed << 24);
+    i += 1;
+  }
+  return hashed >>> 0;
 };

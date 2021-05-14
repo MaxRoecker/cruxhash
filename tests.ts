@@ -120,6 +120,19 @@ describe('hashObject tests', () => {
       hashObject({ a: 1, b: null, c: () => void 0, d: Symbol.match })
     ).toBe(hashObject({ b: null, a: 1, c: () => void 0, d: Symbol.match }));
     expect(hashObject(new Date(0))).toBe(hashObject(new Date(0)));
+    expect(
+      hashObject({
+        hashCode() {
+          return 0x811c;
+        },
+      })
+    ).toBe(
+      hashObject({
+        hashCode() {
+          return 0x811c;
+        },
+      })
+    );
   });
   it('should return different hash for different seeds', () => {
     const seed = 0x9dc5811c;
@@ -132,43 +145,11 @@ describe('hashObject tests', () => {
       hashObject({ a: 1, b: null, c: () => void 0, d: Symbol.match }, seed)
     ).not.toBe(hashObject({ b: null, a: 1, c: () => void 0, d: Symbol.match }));
     expect(hashObject(new Date(0), seed)).not.toBe(hashObject(new Date(0)));
-  });
-  it('should consider the hashCode method', () => {
-    const seed = 0x9dc5811c;
-    expect(
-      hashObject({
-        hashCode() {
-          return 0x811c;
-        },
-      })
-    ).toBe(
-      hashObject({
-        hashCode() {
-          return 0x811c;
-        },
-      })
-    );
     expect(
       hashObject(
         {
           hashCode() {
             return 0x9dc5;
-          },
-        },
-        seed
-      )
-    ).toBe(
-      hashObject({
-        hashCode() {
-          return 0x9dc5;
-        },
-      })
-    );
-    expect(
-      hashObject(
-        {
-          hashCode() {
-            return 0x811c;
           },
         },
         seed

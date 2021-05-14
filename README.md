@@ -68,12 +68,12 @@ can also pass a seed to initialize the hashing.
 
 ### `hashObject(value: object | null, seed?: number)`
 
-Hashes an object or null value into a unsigned int considering:
+Hashes an object value into a unsigned int considering:
 
-- If it has an `hashCode` method, returns `obj.hashCode() >>> 0`;
-- If it is an iterable, returns `hashIterable(obj, seed)`;
-- If it has an `valueOf` method that does not returns itself, returns
-  `hash(obj.valueOf(), seed)`;
+- If it is `null`, returns a fixed value.
+- If it has a `hashCode`, returns `hash(obj.hashCode(), seed)`;
+- If it has an overwritten `valueOf`, returns `hash(obj.valueOf(), seed)`;
+- If it has a `Symbol.iterator`, returns `hashIterable(obj, seed)`;
 - Otherwise, returns `hashIterableAsMap(Object.entries(obj))`.
 
 ### `hashIterable(value: Iterable<unknown>, seed?: number)`
