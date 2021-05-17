@@ -73,7 +73,7 @@ export const hashNumber = (value: number, seed = 0): number => {
  * seed to initialize the hashing.
  */
 export const hashString = (value: string, seed = 0): number => {
-  value = value.normalize();
+  value = value.normalize('NFD');
   const rem = value.length & 3; // "x & 3" is equals to "x % 4"
   const len = value.length - rem;
   const c1 = 0xcc9e2d51;
