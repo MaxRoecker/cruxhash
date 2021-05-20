@@ -46,16 +46,20 @@ export const hashNumber = (value: number, seed = 0): number => {
   if (value === Number.POSITIVE_INFINITY) return (seed ^ 0x42108426) >>> 0;
   if (value === Number.NEGATIVE_INFINITY) return (seed ^ 0x42108427) >>> 0;
 
-  // folds an arbitrary floating number into an integer
-  let fold = value | 0;
-  if (fold !== value) fold = fold ^ (value * 0xffffffff);
-  while (value > 0xffffffff) {
-    value = value / 0xffffffff;
-    fold = fold ^ value;
+  let hashed = seed;
+
+  // if there is an decimal part, take some of them as integers
+  if (!Number.isInteger(value)) {
+    value = value * 0xffffffff;
   }
 
+  // folds the value into an integer
+  do {
+    hashed = hashed ^ value;
+    value = value / 0xffffffff;
+  } while (value > 0xffffffff);
+
   // hashes the integer with Thomas Wang's algorithm
-  let hashed = seed ^ fold;
   hashed = hashed - (hashed << 6);
   hashed = hashed ^ (hashed >>> -15);
   hashed = hashed - (hashed << 9);
