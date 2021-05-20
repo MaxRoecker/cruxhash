@@ -149,17 +149,27 @@ export const hashFunction = (value: Function, seed = 0): number => {
  * Hashes an object value into a unsigned int considering:
  *
  * - If it is `null`, returns a fixed value.
- * - If it has a `hashCode`, returns `hash(obj.hashCode(), seed)`;
- * - If it has an overwritten `valueOf`, returns `hash(obj.valueOf(), seed)`;
+ * - If it has a `hashCode`, returns `hash(value.hashCode(), seed)`;
+ * - If it has an overwritten `valueOf`, returns `hash(value.valueOf(), seed)`;
  * - If it has a `Symbol.iterator` and:
- *   - is an instance of `Set`, returns `hashIterableAsSet(obj, seed)`
- *   - is an instance of `Map`, returns `hashIterableAsMap(obj, seed)`
- *   - otherwise, returns `hashIterable(obj, seed)`
- * - Otherwise, returns `hashIterableAsMap(Object.entries(obj))`.
+ *   - is an instance of `Set`, returns `hashIterableAsSet(value, seed)`
+ *   - is an instance of `Map`, returns `hashIterableAsMap(value, seed)`
+ *   - otherwise, returns `hashIterable(value, seed)`
+ * - Otherwise, returns `hashIterableAsMap(Object.entries(value))`.
+ *
+ * To avoid collisions, this methods also considers the `value.constructor.name`
+ * in the hashing, i.e., objects with equal properties but different
+ * constructors can have a different hashes.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const hashObject = (value: object | null, seed = 0): number => {
   if (value === null) return (seed ^ 0x42108422) >>> 0;
+
+  // changes the seed to use the constructor's name
+  if (typeof value.constructor === 'function') {
+    seed = hashString(value.constructor.name, seed);
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const obj: any = value;
   if (typeof obj.hashCode === 'function') {

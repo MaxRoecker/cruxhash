@@ -22,11 +22,11 @@ console.log(hash('Smile, my dear!')); // returns 897319059
 
 console.log(hash(42, getSeed('my seed'))); // returns 1866919164
 
-console.log(hash({ a: 10, b: 10 })); // returns 3426884542
+console.log(hash({ a: 10, b: 10 })); // returns 854084740
 
-console.log(hash([1, 2, 3])); // returns 149610452
+console.log(hash([1, 2, 3])); // returns 3723853780
 
-console.log(hash('コンニチハ, Hello world, Καλημέρα κόσμε 😀')); // returns 1149923829
+console.log(hash('コンニチハ, Hello world, Καλημέρα κόσμε 😀')); // returns 914674453
 ```
 
 ## API
@@ -68,13 +68,17 @@ can also pass a seed to initialize the hashing.
 Hashes an object value into a unsigned int considering:
 
 - If it is `null`, returns a fixed value.
-- If it has a `hashCode`, returns `hash(obj.hashCode(), seed)`;
-- If it has an overwritten `valueOf`, returns `hash(obj.valueOf(), seed)`;
+- If it has a `hashCode`, returns `hash(value.hashCode(), seed)`;
+- If it has an overwritten `valueOf`, returns `hash(value.valueOf(), seed)`;
 - If it has a `Symbol.iterator` and:
-  - is an instance of `Set`, returns `hashIterableAsSet(obj, seed)`
-  - is an instance of `Map`, returns `hashIterableAsMap(obj, seed)`
-  - otherwise, returns `hashIterable(obj, seed)`
-- Otherwise, returns `hashIterableAsMap(Object.entries(obj))`.
+  - is an instance of `Set`, returns `hashIterableAsSet(value, seed)`
+  - is an instance of `Map`, returns `hashIterableAsMap(value, seed)`
+  - otherwise, returns `hashIterable(value, seed)`
+- Otherwise, returns `hashIterableAsMap(Object.entries(value))`.
+
+To avoid collisions, this methods also considers the `value.constructor.name`
+in the hashing, i.e., objects with equal properties but different
+constructors will probably have a different hashes.
 
 ### `hashIterable(value: Iterable<unknown>, seed?: number)`
 
