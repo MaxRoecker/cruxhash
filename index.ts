@@ -104,17 +104,14 @@ export const hashString = (value: string, seed = 0): number => {
 
   k = 0;
 
-  switch (rem) {
-    case 3:
-      k = k ^ ((value.charCodeAt(i + 2) & 0xffff) << 16);
-    case 2:
-      k = k ^ ((value.charCodeAt(i + 1) & 0xffff) << 8);
-    case 1:
-      k = k ^ ((value.charCodeAt(i + 0) & 0xffff) << 0);
-      k = Math.imul(k, c1);
-      k = (k << 15) | (k >>> -15);
-      k = Math.imul(k, c2);
-      hashed = hashed ^ k;
+  if (rem === 3) k = k ^ ((value.charCodeAt(i + 2) & 0xffff) << 16);
+  if (rem >= 2) k = k ^ ((value.charCodeAt(i + 1) & 0xffff) << 8);
+  if (rem >= 1) {
+    k = k ^ ((value.charCodeAt(i + 0) & 0xffff) << 0);
+    k = Math.imul(k, c1);
+    k = (k << 15) | (k >>> -15);
+    k = Math.imul(k, c2);
+    hashed = hashed ^ k;
   }
 
   hashed = hashed ^ value.length;
