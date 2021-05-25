@@ -1,5 +1,8 @@
 # CRUXHash
 
+[![View on NPM](https://img.shields.io/npm/v/cruxhash?style=flat-square)](https://www.npmjs.com/package/cruxhash)
+[![License](https://img.shields.io/npm/l/cruxhash?style=flat-square)](https://maxroecker.mit-license.org/)
+
 A set of crucial hash functions for ECMAScript.
 
 ## Installation
