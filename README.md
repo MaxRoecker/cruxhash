@@ -23,6 +23,8 @@ import { hash, getSeed } from 'cruxhash';
 
 console.log(hash('Smile, my dear!')); // returns 897319059
 
+console.log(hash(42)); // returns 3941539072
+
 console.log(hash(42, getSeed('my seed'))); // returns 1866919164
 
 console.log(hash({ a: 10, b: 10 })); // returns 854084740
@@ -32,78 +34,12 @@ console.log(hash([1, 2, 3])); // returns 3723853780
 console.log(hash('コンニチハ, Hello world, Καλημέρα κόσμε 😀')); // returns 914674453
 ```
 
-## API
+Most of times, the function [`hash`][hash] is sufficient for making the hash
+codes. If you need some tampering, pass a number to the `seed` parameter to
+start the hash algorithm. You can use the the [`getSeed`][getSeed] function to
+generate some seeds from strings.
 
-### `hash(value: unknown, seed?: number)`
-
-Hashes an value into a unsigned int. You can also pass a seed to initialize
-the hashing. It handles most of trivial ECMAScript values and delegates for
-a specialized hash function.
-
-### `hashBoolean(value: boolean, seed?: number)`
-
-Hashes a boolean into a unsigned int. Guarantees different results for the
-`true` and `false`. You can also pass a seed to initialize the hashing.
-
-### `hashNumber(value: number, seed?: number)`
-
-Hashes an arbitrary number into a unsigned int. Based on [Thomas Wang's 7-shift
-integer hash algorithm][Wang]. Provides support for `NaN`, `Infinity` and
-`-Infinity`. You can also pass a seed to initialize the hashing.
-
-### `hashString(value: string, seed?: number)`
-
-Hashes a string into a unsigned int. Based on [Murmur3][Murmur3] hashing
-algorithm. You can also pass a seed to initialize the hashing.
-
-### `hashSymbol(value: symbol, seed?: number)`
-
-Hashes a symbol into a unsigned int considering its string representation. You
-can also pass a seed to initialize the hashing.
-
-### `hashFunction(value: Function, seed?: number)`
-
-Hashes a function into a unsigned int considering its string representation. You
-can also pass a seed to initialize the hashing.
-
-### `hashObject(value: object | null, seed?: number)`
-
-Hashes an object value into a unsigned int considering:
-
-- If it is `null`, returns a fixed value.
-- If it has a `hashCode`, returns `hash(value.hashCode(), seed)`;
-- If it has an overwritten `valueOf`, returns `hash(value.valueOf(), seed)`;
-- If it has a `Symbol.iterator` and:
-  - is an instance of `Set`, returns `hashIterableAsSet(value, seed)`
-  - is an instance of `Map`, returns `hashIterableAsMap(value, seed)`
-  - otherwise, returns `hashIterable(value, seed)`
-- Otherwise, returns `hashIterableAsMap(Object.entries(value))`.
-
-To avoid collisions, this methods also considers the `value.constructor.name`
-in the hashing, i.e., objects with equal properties but different
-constructors will probably have a different hashes.
-
-### `hashIterable(value: Iterable<unknown>, seed?: number)`
-
-Hashes an iterable into a unsigned int considering its content. Based on
-[Murmur3][Murmur3] hashing algorithm. You can also pass a seed to initialize the
-hashing.
-
-### `hashIterableAsSet(value: Iterable<unknown>, seed?: number)`
-
-Hashes an iterable into a unsigned int ignoring the order of the elements. Based
-on [Murmur3][Murmur3] hashing algorithm. You can also pass a seed to initialize
-the hashing.
-
-### `hashIterableAsMap(value: Iterable<[unknown, unknown]>, seed?: number)`
-
-Hashes an iterable into a unsigned int ignoring the order of the entries. Based
-on [Murmur3][Murmur3] hashing algorithm. You can also pass a seed to initialize
-the hashing.
-
-### `getSeed(str: string)`
-
-Returns a seed for the given string.
+Other functions are available, see the [Wiki's Page][Wiki] for the complete API!
 
 ## Contributing
 
@@ -118,3 +54,6 @@ Please make sure to update tests as appropriate.
 
 [Wang]: http://burtleburtle.net/bob/hash/integer.html
 [Murmur3]: https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
+[Wiki]: https://github.com/MaxRoecker/cruxhash/wiki
+[hash]: https://github.com/MaxRoecker/cruxhash/wiki#hash
+[getSeed]: https://github.com/MaxRoecker/cruxhash/wiki#getseed
