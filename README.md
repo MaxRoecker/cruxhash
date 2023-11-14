@@ -21,17 +21,17 @@ for trivial ECMAScript values. See the example bellow:
 ```js
 import { hash, getSeed } from 'cruxhash';
 
-console.log(hash('Smile, my dear!')); // returns 897319059
+console.log(hash('Smile, my dear!')); // returns 2021251023
 
-console.log(hash(42)); // returns 3941539072
+console.log(hash(42)); // returns 263345866
 
-console.log(hash(42, getSeed('my seed'))); // returns 1866919164
+console.log(hash(42, getSeed('my seed'))); // returns 601891187
 
-console.log(hash({ a: 10, b: 10 })); // returns 854084740
+console.log(hash({ a: 10, b: 10 })); // returns 1998809215
 
-console.log(hash([1, 2, 3])); // returns 3723853780
+console.log(hash([1, 2, 3])); // returns 1610248376
 
-console.log(hash('コンニチハ, Hello world, Καλημέρα κόσμε 😀')); // returns 914674453
+console.log(hash('コンニチハ, Hello world, Καλημέρα κόσμε 😀')); // returns 954651608
 ```
 
 Most of times, the function [`hash`][hash] is sufficient for making the hash

@@ -1,25 +1,22 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
-    "lib": ["ES2020"],
-    "target": "ES2015",
-    "module": "ES2015",
-    "moduleResolution": "Node",
+    "target": "ES2020",
+    "module": "esnext",
     "strict": true,
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "inlineSources": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Bundler",
+    "skipLibCheck": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "stripInternal": true
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "allowJs": true,
+    "noEmit": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "types": ["bun-types"],
+    "lib": ["ESNext"]
   },
-  "files": ["index.ts", "tests.ts"]
+  "files": ["src/index.ts"]
 }
