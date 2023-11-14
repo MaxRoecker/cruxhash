@@ -1,5 +1,11 @@
 # cruxhash
 
+## 2.0.3
+
+### Patch Changes
+
+- df88287: Fix dependencies
+
 ## 2.0.2
 
 ### Patch Changes
