@@ -1,5 +1,11 @@
 # cruxhash
 
+## 2.0.2
+
+### Patch Changes
+
+- d4da6c1: Fix action workflow
+
 ## 2.0.1
 
 ### Patch Changes
