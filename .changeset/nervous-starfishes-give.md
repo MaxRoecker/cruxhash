@@ -1,0 +1,5 @@
+---
+'cruxhash': patch
+---
+
+Fix dependencies
