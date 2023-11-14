@@ -1,5 +1,11 @@
 # cruxhash
 
+## 2.0.1
+
+### Patch Changes
+
+- fb4db77: Changes on worflows
+
 ## 2.0.0
 
 ### Major Changes
