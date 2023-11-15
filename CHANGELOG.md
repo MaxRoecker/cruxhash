@@ -1,5 +1,16 @@
 # cruxhash
 
+## 2.1.0
+
+### Minor Changes
+
+- 4ef7d7b: Add hashBytes function
+
+### Patch Changes
+
+- 05bd759: Use NFD on string normalization
+- a7565d2: Improve test readability
+
 ## 2.0.3
 
 ### Patch Changes
