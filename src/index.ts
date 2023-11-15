@@ -65,14 +65,14 @@ export function hashNumber(value: number, seed = 0): number {
 
 /**
  * Hashes a string into a unsigned int considering its Unicode Normalization
- * NFC form.
+ * NFD form.
  *
  * @param value the string to be hashed
  * @param seed a number to start the hashing
  * @returns an unsigned integer
  */
 export function hashString(value: string, seed = 0): number {
-  const normalized = value.normalize('NFC');
+  const normalized = value.normalize('NFD');
   const encoded = encode(normalized);
   return murmur3(encoded, seed);
 }

@@ -78,12 +78,12 @@ describe('hash string', () => {
     expect(hash(case2, seed)).not.toBe(hash(case2));
   });
   it('should return the same hash equivalent unicode code points', () => {
-    // "ñ"
-    expect(hash('\u00F1')).toBe(hash('\u006E\u0303'));
-    // Amélie
-    expect(hash('\u0041\u006d\u00e9\u006c\u0069\u0065')).toBe(
-      hash('\u0041\u006d\u0065\u0301\u006c\u0069\u0065'),
-    );
+    const case0 = { nfc: '\u00F1', nfd: '\u006E\u0303' }; // "ñ"
+    const case1 = { nfc: '\u1EBF', nfd: '\u0065\u0302\u0301' }; // "ế"
+    const case2 = { nfc: 'Am\u00e9lie', nfd: 'Am\u0065\u0301lie' }; // "Amélie
+    expect(hash(case0.nfc)).toBe(hash(case0.nfd));
+    expect(hash(case1.nfc)).toBe(hash(case1.nfd));
+    expect(hash(case2.nfc)).toBe(hash(case2.nfd));
   });
 });
 
