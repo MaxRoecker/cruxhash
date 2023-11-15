@@ -89,17 +89,17 @@ describe('hash string', () => {
 
 describe('hash bigint', () => {
   it('should return the same hash for the same value', () => {
-    const big = '10000000000000000000000000000000000000';
+    const big = 10000000000000000000000000000000000000n;
     expect(hash(0n)).toBe(hash(-0n));
     expect(hash(8n)).toBe(hash(8n));
-    expect(hash(BigInt(big))).toBe(hash(BigInt(big)));
+    expect(hash(big)).toBe(hash(big));
   });
   it('should return different hash for different seeds', () => {
-    const big = '10000000000000000000000000000000000000';
+    const big = 10000000000000000000000000000000000000n;
     const seed = 0x9dc5811c;
     expect(hash(0n, seed)).not.toBe(hash(-0n));
     expect(hash(8n, seed)).not.toBe(hash(8n));
-    expect(hash(BigInt(big), seed)).not.toBe(hash(BigInt(big)));
+    expect(hash(big, seed)).not.toBe(hash(big));
   });
 });
 
