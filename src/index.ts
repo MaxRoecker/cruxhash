@@ -59,8 +59,7 @@ export function hashNumber(value: number, seed = 0): number {
   }
   const view = new DataView(new ArrayBuffer(8));
   view.setFloat64(0, value, true);
-  const buffer = new Uint8Array(view.buffer);
-  return murmur3(buffer, seed);
+  return murmur3(view.buffer, seed);
 }
 
 /**
@@ -74,7 +73,7 @@ export function hashNumber(value: number, seed = 0): number {
 export function hashString(value: string, seed = 0): number {
   const normalized = value.normalize('NFD');
   const encoded = encode(normalized);
-  return murmur3(encoded, seed);
+  return murmur3(encoded.buffer, seed);
 }
 
 /**
@@ -86,7 +85,7 @@ export function hashString(value: string, seed = 0): number {
  */
 export function hashBigint(value: bigint, seed = 0): number {
   const encoded = encode(value.toString(36));
-  return murmur3(encoded, seed);
+  return murmur3(encoded.buffer, seed);
 }
 
 /**
@@ -98,7 +97,7 @@ export function hashBigint(value: bigint, seed = 0): number {
  */
 export function hashSymbol(value: symbol, seed = 0): number {
   const encoded = encode(value.toString());
-  return murmur3(encoded, seed);
+  return murmur3(encoded.buffer, seed);
 }
 
 /**
@@ -111,7 +110,7 @@ export function hashSymbol(value: symbol, seed = 0): number {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function hashFunction(value: Function, seed = 0): number {
   const encoded = encode(value.toString());
-  return murmur3(encoded, seed);
+  return murmur3(encoded.buffer, seed);
 }
 
 /**
@@ -120,10 +119,12 @@ export function hashFunction(value: Function, seed = 0): number {
  * - If it is `null`, returns a fixed value.
  * - If it has a `hashCode`, returns `hash(value.hashCode(), seed)`;
  * - If it has an overwritten `valueOf`, returns `hash(value.valueOf(), seed)`;
+ * - If it is an instance of `ArrayBuffer`, returns `hashBytes(value)`;
+ * - If `ArrayBuffer.isView(value)` is true, returns `hashBytes(value.buffer)`;
  * - If it has a `Symbol.iterator` and:
- *   - is an instance of `Set`, returns `hashValues(value, seed)`
- *   - is an instance of `Map`, returns `hashEntries(value, seed)`
- *   - otherwise, returns `hashSequence(value, seed)`
+ *   - is an instance of `Set`, returns `hashValues(value, seed)`;
+ *   - is an instance of `Map`, returns `hashEntries(value, seed)`;
+ *   - otherwise, returns `hashSequence(value, seed)`.
  * - Otherwise, returns `hashEntries(Object.entries(value))`.
  *
  * To avoid collisions, this methods also considers the `value.constructor.name`
@@ -140,7 +141,7 @@ export function hashObject(value: object | null, seed = 0): number {
   // changes the seed to use the constructor's name
   if ('constructor' in value && typeof value.constructor === 'function') {
     const encoded = encode(value.constructor.name);
-    seed = murmur3(encoded, seed);
+    seed = murmur3(encoded.buffer, seed);
   }
 
   if ('hashCode' in value && typeof value.hashCode === 'function') {
@@ -155,10 +156,16 @@ export function hashObject(value: object | null, seed = 0): number {
     return hash(value.valueOf(), seed);
   }
 
-  if (isIterable(value)) {
+  if (value instanceof ArrayBuffer) return hashBytes(value, seed);
+  if (ArrayBuffer.isView(value)) return hashBytes(value.buffer, seed);
+
+  if (
+    Symbol.iterator in value &&
+    typeof value[Symbol.iterator] === 'function'
+  ) {
     if (value instanceof Set) return hashValues(value, seed);
     if (value instanceof Map) return hashEntries(value, seed);
-    return hashSequence(value, seed);
+    return hashSequence(value as Iterable<unknown>, seed);
   }
 
   return hashEntries(Object.entries(value), seed);
@@ -176,15 +183,14 @@ export function hashSequence(value: Iterable<unknown>, seed = 0): number {
   const mapfn = (element: unknown) => hash(element, seed);
   // @ts-expect-error value is not required to be an number iterable if the
   //                  mapping function returns a number.
-  const temp = Uint32Array.from(value, mapfn);
-  const buffer = new Uint8Array(temp.buffer);
-  return murmur3(buffer, seed);
+  const hashes = Uint32Array.from(value, mapfn);
+  return murmur3(hashes.buffer, seed);
 }
 
 /**
  * Hashes an iterable into a unsigned int considering only the elements.
  *
- * @param value the elements iterable to be hashed
+ * @param value the iterable to be hashed
  * @param seed a number to start the hashing
  * @returns an unsigned integer
  */
@@ -192,15 +198,14 @@ export function hashValues(value: Iterable<unknown>, seed = 0): number {
   const mapfn = (element: unknown) => hash(element, seed);
   // @ts-expect-error value is not required to be an number iterable if the
   //                  mapping function returns a number.
-  const temp = Uint32Array.from(value, mapfn).sort();
-  const buffer = new Uint8Array(temp.buffer);
-  return murmur3(buffer, seed);
+  const hashes = Uint32Array.from(value, mapfn).sort();
+  return murmur3(hashes.buffer, seed);
 }
 
 /**
  * Hashes an iterable into a unsigned int considering only the entries.
  *
- * @param value the entries iterable to be hashed
+ * @param value the iterable to be hashed
  * @param seed a number to start the hashing
  * @returns an unsigned integer
  */
@@ -211,9 +216,19 @@ export function hashEntries(
   const mapfn = (element: [unknown, unknown]) => hashSequence(element, seed);
   // @ts-expect-error value is not required to be an number iterable if the
   //                  mapping function returns a number.
-  const temp = Uint32Array.from(value, mapfn).sort();
-  const buffer = new Uint8Array(temp.buffer);
-  return murmur3(buffer, seed);
+  const hashes = Uint32Array.from(value, mapfn).sort();
+  return murmur3(hashes.buffer, seed);
+}
+
+/**
+ * Hashes a buffer into a unsigned int.
+ *
+ * @param value the buffer to be hashed
+ * @param seed a number to start the hashing
+ * @returns an unsigned integer
+ */
+export function hashBytes(value: ArrayBufferLike, seed = 0): number {
+  return murmur3(value, seed);
 }
 
 /**
@@ -234,51 +249,47 @@ const UNKNOWN_KEY = 0x42108424;
 
 const encode = TextEncoder.prototype.encode.bind(new TextEncoder('utf-8'));
 
-function isIterable(value: unknown): value is Iterable<unknown> {
-  if (typeof value !== 'object' || value == null) return false;
-  return (
-    Symbol.iterator in value && typeof value[Symbol.iterator] === 'function'
-  );
-}
 /**
- * Hashes an integer number into a unsigned int. Based on [Thomas Wang's
- * 6-shift integer hash algorithm][Wang].
+ * Hashes an integer number into a unsigned int using the [Thomas Wang's
+ * ][Wang] 32bit shift and multiplication algorithm.
  *
- * [Wang]: http://burtleburtle.net/bob/hash/integer.html
+ * [Wang]: http://web.archive.org/web/20071223173210/http://www.concentric.net/~Ttwang/tech/inthash.htm
  *
- * @param input the number to be hashed
+ * @param int the integer to be hashed
  * @returns an unsigned integer
  */
-function wang(input: number, seed = 0): number {
-  input = input ^ seed;
-  input = input + ~(input << 15);
-  input = input ^ (input >> 10);
-  input = input + (input << 3);
-  input = input ^ (input >> 6);
-  input = input + ~(input << 11);
-  input = input ^ (input >> 16);
-  return input >>> 0;
+function wang(int: number, seed = 0): number {
+  const c1 = 0x27d4eb2d;
+  int = int ^ seed;
+  int = int ^ 61 ^ (int >>> 16);
+  int = int + (int << 3);
+  int = int ^ (int >>> 4);
+  int = Math.imul(int, c1);
+  int = int ^ (int >>> 15);
+  return int >>> 0;
 }
 
 /**
- * Returns the hash from the input array using the Murmur3 algorithm.
+ * Returns the hash from the input array using the [Murmur3 algorithm][Murmur3].
  *
- * @param input An Uint16Array
+ * [Murmur3]: https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
+ *
+ * @param buffer The bytes to be hashed
  * @param seed The seed of the hash
  * @returns an unsigned integer
  */
-function murmur3(input: Uint8Array, seed: number): number {
+function murmur3(buffer: ArrayBufferLike, seed: number): number {
   const c1 = 0xcc9e2d51;
   const c2 = 0x1b873593;
-  const buffer = new DataView(input.buffer, input.byteOffset);
-  const remainder = input.byteLength & 3;
-  const len = input.byteLength - remainder;
+  const view = new DataView(buffer);
+  const remainder = buffer.byteLength & 3;
+  const byteLength = buffer.byteLength - remainder;
   let h1 = seed;
   let i = 0;
 
   // body
-  while (i < len) {
-    let k1 = buffer.getUint32(i, true);
+  while (i < byteLength) {
+    let k1 = view.getUint32(i, true);
     i = i + 4;
     k1 = Math.imul(k1, c1);
     k1 = (k1 << 15) | (k1 >>> 17);
@@ -292,11 +303,11 @@ function murmur3(input: Uint8Array, seed: number): number {
   let k1: number = 0x0;
   switch (remainder) {
     case 3:
-      k1 = k1 ^ (input[i + 2] << 16);
+      k1 = k1 ^ (view.getUint8(i + 2) << 16);
     case 2:
-      k1 = k1 ^ (input[i + 1] << 8);
+      k1 = k1 ^ (view.getUint8(i + 1) << 8);
     case 1:
-      k1 = k1 ^ input[i];
+      k1 = k1 ^ view.getUint8(i);
       k1 = Math.imul(k1, c1);
       k1 = (k1 << 15) | (k1 >>> 17);
       k1 = Math.imul(k1, c2);
@@ -304,7 +315,7 @@ function murmur3(input: Uint8Array, seed: number): number {
   }
 
   // finalization
-  h1 = h1 ^ ((len + remainder) & 0xffffffff);
+  h1 = h1 ^ ((byteLength + remainder) & 0xffffffff);
   h1 = h1 ^ (h1 >>> 16);
   h1 = Math.imul(h1, 0x85ebca6b);
   h1 = h1 ^ (h1 >>> 13);

@@ -317,3 +317,50 @@ describe('hash entries', () => {
     );
   });
 });
+
+describe('hash bytes', () => {
+  it('should return the same hash for the same value', () => {
+    const case0A = Uint8Array.from([]);
+    const case0B = Uint8Array.from([]);
+    expect(hash(case0A)).toBe(hash(case0B));
+    expect(hash(case0A.buffer)).toBe(hash(case0B.buffer));
+
+    const case1A = Uint8Array.from([0x0f, 0xf0]);
+    const case1B = Uint8Array.from([0x0f, 0xf0]);
+    expect(hash(case1A)).toBe(hash(case1B));
+    expect(hash(case1A.buffer)).toBe(hash(case1B.buffer));
+
+    const case2A = Uint8Array.from([0xf0, 0x0f]);
+    const case2B = Uint16Array.from([0x0ff0]);
+    expect(hash(case2A.buffer)).toBe(hash(case2B.buffer));
+
+    const case3A = Uint8Array.from([0x00, 0x0f, 0xf0, 0xff]);
+    const case3B = Uint16Array.from([0x0f00, 0xfff0]);
+    const case3C = Uint32Array.from([0xfff00f00]);
+    expect(hash(case3A.buffer)).toBe(hash(case3B.buffer));
+    expect(hash(case3A.buffer)).toBe(hash(case3C.buffer));
+  });
+  it('should return different hash for different seeds', () => {
+    const seed = 0x9dc5811c;
+
+    const case0A = Uint8Array.from([]);
+    const case0B = Uint8Array.from([]);
+    expect(hash(case0A, seed)).not.toBe(hash(case0B));
+    expect(hash(case0A.buffer, seed)).not.toBe(hash(case0B.buffer));
+
+    const case1A = Uint8Array.from([0x0f, 0xf0]);
+    const case1B = Uint8Array.from([0x0f, 0xf0]);
+    expect(hash(case1A, seed)).not.toBe(hash(case1B));
+    expect(hash(case1A.buffer, seed)).not.toBe(hash(case1B.buffer));
+
+    const case2A = Uint8Array.from([0xf0, 0x0f]);
+    const case2B = Uint16Array.from([0x0ff0]);
+    expect(hash(case2A.buffer, seed)).not.toBe(hash(case2B.buffer));
+
+    const case3A = Uint8Array.from([0x00, 0x0f, 0xf0, 0xff]);
+    const case3B = Uint16Array.from([0x0f00, 0xfff0]);
+    const case3C = Uint32Array.from([0xfff00f00]);
+    expect(hash(case3A.buffer, seed)).not.toBe(hash(case3B.buffer));
+    expect(hash(case3A.buffer, seed)).not.toBe(hash(case3C.buffer));
+  });
+});
