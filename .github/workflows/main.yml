@@ -24,7 +24,7 @@ jobs:
       - name: Cache bun modules
         uses: actions/cache@v3
         env:
-          cache-name: cache-bun-modules
+          cache-name: bun-modules
         with:
           path: ~/.bun/install/cache/
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/bun.lockb') }}
