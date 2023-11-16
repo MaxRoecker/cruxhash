@@ -27,7 +27,7 @@ jobs:
           cache-name: cache-bun-modules
         with:
           # bun cache files are stored in `~/.bun` on Linux/macOS
-          path: ~/.bun
+          path: ~/.bun/install/cache/
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/bun.lockb') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
