@@ -21,7 +21,7 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Cache node modules
+      - name: Cache bun modules
         uses: actions/cache@v3
         env:
           cache-name: cache-bun-modules
