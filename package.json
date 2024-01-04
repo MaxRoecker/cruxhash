@@ -13,14 +13,20 @@
   ],
   "exports": {
     ".": {
-      "default": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MaxRoecker/cruxhash.git"
   },
   "keywords": [
+    "javascript",
+    "typescript",
     "hash",
     "murmur",
     "wang"
@@ -30,61 +36,34 @@
   },
   "homepage": "https://github.com/MaxRoecker/cruxhash#readme",
   "scripts": {
+    "test": "bun test --coverage",
     "clean": "rm -rf dist",
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": "bun test --coverage",
-    "lint": "eslint src/*.ts --ignore-path .gitignore",
+    "ignore-sync": "ignore-sync .",
+    "lint": "eslint src/**/*.ts",
+    "types": "tsc -p ./tsconfig.json",
+    "format": "prettier ./src/**/*.ts --write",
     "docs": "typedoc src/index.ts --plugin typedoc-plugin-markdown --disableSources --readme none",
     "release": "bun run build && changeset publish"
   },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.20"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@typescript-eslint/eslint-plugin": "^6.10.0",
-    "@typescript-eslint/parser": "^6.10.0",
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
     "bun-plugin-dts": "^0.2.1",
-    "bun-types": "latest",
-    "eslint": "^8.53.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "prettier": "^3.1.0",
-    "tsup": "^7.2.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "ignore-sync": "^7.0.1",
+    "prettier": "^3.1.1",
+    "tsup": "^8.0.1",
     "typedoc": "^0.25.3",
     "typedoc-plugin-markdown": "^3.17.1",
-    "typescript": "^5.0.0"
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "es2020": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended",
-      "prettier"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": "latest",
-      "sourceType": "module"
-    },
-    "plugins": [
-      "@typescript-eslint",
-      "prettier"
-    ],
-    "rules": {}
-  },
-  "prettier": {
-    "arrowParens": "always",
-    "bracketSameLine": false,
-    "bracketSpacing": true,
-    "jsxSingleQuote": false,
-    "printWidth": 80,
-    "quoteProps": "consistent",
-    "semi": true,
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "all",
-    "useTabs": false
+    "typescript": "^5.3.3"
   }
 }
