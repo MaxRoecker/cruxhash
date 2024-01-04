@@ -1,5 +1,12 @@
 # cruxhash
 
+## 2.1.1
+
+### Patch Changes
+
+- 7716485: Update dependencies
+- 6456cfa: Add ignore-sync and type checking
+
 ## 2.1.0
 
 ### Minor Changes

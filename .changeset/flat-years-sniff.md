@@ -1,5 +1,0 @@
----
-'cruxhash': patch
----
-
-Update dependencies
