@@ -1,4 +1,5 @@
 /* eslint-disable no-fallthrough */
+
 /**
  * Hashes an value into a unsigned int.
  *
