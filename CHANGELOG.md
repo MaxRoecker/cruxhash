@@ -1,5 +1,11 @@
 # cruxhash
 
+## 2.1.2
+
+### Patch Changes
+
+- 96ee756: Sync .ignore files
+
 ## 2.1.1
 
 ### Patch Changes
